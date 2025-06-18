@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f6ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 360px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a3fc3;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        .input-with-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-with-button input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .qr-btn {
+            padding: 8px 10px;
+            border: none;
+            background-color: #1a3fc3;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        input[type="date"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            background-color: #1a3fc3;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        #qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+        }
+
+        #qr-modal .content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 10% auto;
+            position: relative;
+        }
+
+        #qr-modal button.close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Book Appointment</h2>
+
+        <label for="patient-search">Patient QR / Search</label>
+        <div class="input-with-button">
+            <input type="text" id="patient-search" placeholder="Scan QR or enter patient name" />
+            <button class="qr-btn" id="qr-scan-btn" title="Scan QR">📷</button>
+        </div>
+
+        <label for="appointment-date">Appointment Date</label>
+        <input type="date" id="appointment-date" />
+
+        <label for="appointment-time">Appointment Time</label>
+        <input type="time" id="appointment-time" />
+
+        <label for="doctor">Select Doctor (optional)</label>
+        <select id="doctor">
+            <option value="auto">Auto-Assign</option>
+            <option value="dr-john">Dr. John</option>
+            <option value="dr-chan">Dr. Chan</option>
+            <option value="dr-joseph">Dr. Joseph</option>
+        </select>
+
+        <button class="submit-btn">
+            <span>📅</span> Book Appointment
+        </button>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div id="qr-modal">
+        <div class="content">
+            <div id="qr-reader" style="width: 100%"></div>
+            <button class="close" onclick="closeQRScanner()">&times;</button>
+        </div>
+    </div>
+
+
+    <script>
+        const qrBtn = document.getElementById("qr-scan-btn");
+        const qrModal = document.getElementById("qr-modal");
+        const qrInput = document.getElementById("patient-search");
+        let html5QrCode;
+
+        qrBtn.addEventListener("click", () => {
+            qrModal.style.display = "block";
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    qrInput.value = decodedText;
+                    html5QrCode.stop().then(() => {
+                        qrModal.style.display = "none";
+                    }).catch(err => console.error(err));
+                },
+                (err) => {
+                    // scanning errors
+                }
+            ).catch(err => {
+                console.error("QR start failed", err);
+            });
+        });
+
+        function closeQRScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    qrModal.style.display = "none";
+                }).catch(err => console.error("Stop error:", err));
+            } else {
+                qrModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>

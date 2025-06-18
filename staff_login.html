@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Clinic PMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f1f6fd;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 400px;
+            margin: 80px auto;
+        }
+
+        .role-tabs .nav-link {
+            color: #0d6efd;
+            font-weight: 500;
+        }
+
+        .role-tabs .nav-link.active {
+            background-color: #eaf0fd;
+            border-bottom: 2px solid #0d6efd;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-white shadow-sm px-4">
+        <a class="navbar-brand fw-bold" href="index.html">Clinic PMS</a>
+
+    </nav>
+
+    <div class="login-box">
+        <ul class="nav nav-tabs role-tabs mb-3" id="roleTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="receptionist-tab" data-bs-toggle="tab" data-bs-target="#receptionist"
+                    type="button" role="tab">Receptionist</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button"
+                    role="tab">Admin</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="doctor-tab" data-bs-toggle="tab" data-bs-target="#doctor" type="button"
+                    role="tab">Doctor</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="receptionist" role="tabpanel">
+                <form>
+                    <div class="mb-3">
+                        <label for="emailReceptionist" class="form-label">Email/Username</label>
+                        <input type="text" class="form-control" id="emailReceptionist"
+                            placeholder="Enter your email or username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordReceptionist" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="passwordReceptionist"
+                            placeholder="Enter your password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="admin" role="tabpanel">
+                <form>
+                    <div class="mb-3">
+                        <label for="emailAdmin" class="form-label">Email/Username</label>
+                        <input type="text" class="form-control" id="emailAdmin"
+                            placeholder="Enter your email or username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordAdmin" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="passwordAdmin"
+                            placeholder="Enter your password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="doctor" role="tabpanel">
+                <form>
+                    <div class="mb-3">
+                        <label for="emailDoctor" class="form-label">Email/Username</label>
+                        <input type="text" class="form-control" id="emailDoctor"
+                            placeholder="Enter your email or username" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="passwordDoctor" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="passwordDoctor"
+                            placeholder="Enter your password" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-2 bg-white shadow-sm px-4">
+        <div>
+            <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
+            <div class="d-flex justify-content-center align-items-center gap-3">
+                <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150" height="auto">
+                <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60" height="auto">
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
