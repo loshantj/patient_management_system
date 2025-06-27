@@ -4,24 +4,36 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Clinic PMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        body {
-            background-color: #f1f6fd;
-        }
+    <title>Patient Login - Clinic PMS</title>
 
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Patient login portal for Clinic PMS - Manage your appointments and medical records securely." />
+    <meta name="keywords" content="patient login, clinic pms, healthcare system, sri lanka" />
+    <meta name="author" content="EDIC UOK" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css" />
+
+    <style>
         .login-box {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 60px auto;
             padding: 30px;
-            max-width: 450px;
-            margin: 80px auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
 
         .role-tabs .nav-link {
-            color: #0d6efd;
             font-weight: 500;
         }
 
@@ -34,30 +46,34 @@
 </head>
 
 <body>
+    <!-- Navigation -->
     <nav class="navbar navbar-light bg-white shadow-sm px-4">
-        <a class="navbar-brand fw-bold" href="index.html">Clinic PMS</a>
+        <a class="navbar-brand fw-bold" href="index.html" aria-label="Go to Clinic PMS Home">Clinic PMS</a>
     </nav>
 
+    <!-- Login Box -->
     <div class="login-box">
         <ul class="nav nav-tabs role-tabs mb-3" id="roleTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient"
-                    type="button" role="tab">Patient</button>
+                    type="button" role="tab" aria-controls="patient" aria-selected="true">Patient</button>
             </li>
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="patient" role="tabpanel">
-                <form>
+            <div class="tab-pane fade show active" id="patient" role="tabpanel" aria-labelledby="patient-tab">
+                <form action="patient_login.php" method="POST">
                     <div class="mb-3">
-                        <label for="emailPatient" class="form-label">Email/Username</label>
-                        <input type="email" class="form-control" id="emailPatient"
-                            placeholder="Enter your email or username" />
+                        <label for="emailPatient" class="form-label">Email or Username</label>
+                        <input type="email" name="email" class="form-control" id="emailPatient"
+                            placeholder="Enter your email or username" required autocomplete="username"
+                            aria-label="Patient Email or Username" />
                     </div>
                     <div class="mb-3">
                         <label for="passwordPatient" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="passwordPatient"
-                            placeholder="Enter your password" />
+                        <input type="password" name="password" class="form-control" id="passwordPatient"
+                            placeholder="Enter your password" required autocomplete="current-password"
+                            aria-label="Patient Password" />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
@@ -65,12 +81,17 @@
         </div>
     </div>
 
-    <footer class="text-center py-2 bg-white shadow-sm px-4">
+    <!-- Footer -->
+    <footer class="text-center py-2 bg-white shadow-sm px-4 mt-5">
         <div>
             <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
-            <div class="d-flex justify-content-center align-items-center gap-3">
-                <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150" height="auto">
-                <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60" height="auto">
+            <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                <a href="https://science.kln.ac.lk/units/edaic/" target="_blank" aria-label="EDIC Website">
+                    <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150">
+                </a>
+                <a href="https://www.kln.ac.lk/" target="_blank" aria-label="University of Kelaniya">
+                    <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60">
+                </a>
             </div>
         </div>
     </footer>

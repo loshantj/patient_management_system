@@ -2,108 +2,116 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clinic PMS - Landing Page</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
-        footer {
-            background-color: #696e74;
-            padding: 20px 0;
-            text-align: center;
-          }
-          footer img {
-            margin: 0 10px;
-          }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinic PMS - Landing Page</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Clinic PMS - Manage appointments, patients, and clinical workflows at the National Institute of Infectious Diseases." />
+  <meta name="keywords" content="Clinic, PMS, NIID, Sri Lanka, appointments, healthcare" />
+  <meta name="author" content="EDIC UOK" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
+
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-white shadow-sm px-4">
-        <a class="navbar-brand fw-bold" href="#">Clinic PMS</a>
-        <a class="btn btn-outline-primary" href="patient_login.html">Login</a>
-    </nav>
+  <!-- Navbar -->
+  <nav class="navbar navbar-light bg-white shadow-sm px-4">
+    <a class="navbar-brand fw-bold" href="#">Clinic PMS</a>
+    <a class="btn btn-outline-primary" href="patient_login.html" aria-label="Login for Patients">
+      <i class="bi bi-box-arrow-in-right"></i> Login
+    </a>
+  </nav>
 
-    <header class="text-center py-5 bg-light">
-        <div class="container">
-            <h1 class="fw-bold">National Institute of Infectious Diseases</h1>
-            <p class="lead">Efficiently manage appointments, patients, and clinical workflows with role-based access for
-                your team.</p>
-            <div class="mt-4">
-                <a href="appointments.html" class="btn btn-primary me-2">Book Appointment</a>
-                <a href="staff_login.html" class="btn btn-outline-primary">Admin/Staff Login</a>
-            </div>
+  <!-- Hero Section -->
+  <header class="text-center py-5 bg-light">
+    <div class="container">
+      <h1 class="fw-bold">National Institute of Infectious Diseases</h1>
+      <p class="lead">Efficiently manage appointments, patients, and clinical workflows with role-based access for your team.</p>
+      <div class="mt-4">
+        <a href="appointments.html" class="btn btn-primary me-2">Book Appointment</a>
+        <a href="staff_login.html" class="btn btn-outline-primary">Admin/Staff Login</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Video Section -->
+  <section class="container py-5">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card">
+          <video controls autoplay muted class="w-100" aria-label="Clinic Overview Video">
+            <source src="assets/img/clinic_overview.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="card-body">
+            <h5 class="card-title">Clinic Overview</h5>
+            <p class="card-text">Get to know our facilities and services.</p>
+          </div>
         </div>
-    </header>
-
-    <section class="container py-5">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <video controls autoplay muted class="w-100">
-                        <source src="assets/img/clinic_overview.mp4" type="video/mp4">
-                    </video>
-                    <div class="card-body">
-                        <h5 class="card-title">Clinic Overview</h5>
-                        <p class="card-text">Get to know our facilities and services.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <video controls autoplay muted class="w-100">
-                        <source src="assets/img/how_to_book.mp4" type="video/mp4">
-                    </video>
-                    <div class="card-body">
-                        <h5 class="card-title">How to Book</h5>
-                        <p class="card-text">See how easy it is to book an appointment.</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <video controls autoplay muted class="w-100" aria-label="How to Book an Appointment Video">
+            <source src="assets/img/how_to_book.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="card-body">
+            <h5 class="card-title">How to Book</h5>
+            <p class="card-text">See how easy it is to book an appointment.</p>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="bg-light py-5">
-        <div class="container text-center">
-            <h3>About Our Hospital</h3>
-            <p class="mt-3">
-                The National Institute of Infection Diseases (NIID), formally known as the 
-                Infectious Diseases Hospital (IDH) is the focal point, the main referral centre 
-                and main training center for infectious diseases in Sri Lanka. It is situated in
-                Angoda, Colombo on a 34 acre block of land, consisting of 300 beds.
-            </p>
-        </div>
-    </section>
+  <!-- About Section -->
+  <section class="bg-light py-5">
+    <div class="container text-center">
+      <h3>About Our Hospital</h3>
+      <p class="mt-3">
+        The National Institute of Infectious Diseases (NIID), formerly known as the Infectious Diseases Hospital (IDH), is the focal point, main referral center, and training center for infectious diseases in Sri Lanka. It is situated in Angoda, Colombo on a 34-acre block of land, consisting of 300 beds.
+      </p>
+    </div>
+  </section>
 
-    <section class="py-4">
-        <div class="container text-center">
-            <h5>Our Sponsors</h5>
-            <div class="d-flex justify-content-center gap-5 mt-3">
-                <span>MedKIT</span>
-                <span>Visa Health</span>
-                <span>Pulse Foundation</span>
-                <span>Care4All</span>
-            </div>
-        </div>
-    </section>
+  <!-- Sponsors Section -->
+  <section class="py-4">
+    <div class="container text-center">
+      <h5>Our Sponsors</h5>
+      <div class="d-flex justify-content-center gap-5 mt-3 flex-wrap">
+        <span class="sponsor">MedKIT</span>
+        <span class="sponsor">Visa Health</span>
+        <span class="sponsor">Pulse Foundation</span>
+        <span class="sponsor">Care4All</span>
+      </div>
+    </div>
+  </section>
 
-    <footer class="text-center py-2 bg-white shadow-sm px-4">
-        <div>
-            <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
-            <div class="d-flex justify-content-center align-items-center gap-3">
-                <a href="https://science.kln.ac.lk/units/edaic/" target="_blank">
-                    <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150" height="auto">
-                </a>
-                <a href="https://www.kln.ac.lk/" target="_blank">
-                    <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60" height="auto">
-                </a>
-            </div>
-        </div>  
-    </footer>
-      
+  <!-- Footer -->
+  <footer class="text-center py-2 bg-white shadow-sm px-4">
+    <div>
+      <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
+      <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+        <a href="https://science.kln.ac.lk/units/edaic/" target="_blank" aria-label="EDIC UOK Website">
+          <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150">
+        </a>
+        <a href="https://www.kln.ac.lk/" target="_blank" aria-label="University of Kelaniya Website">
+          <img src="assets/img/uok-logo.png" alt="University of Kelaniya Logo" width="60">
+        </a>
+      </div>
+    </div>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
