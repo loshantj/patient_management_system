@@ -36,14 +36,13 @@
 <body>
     <nav class="navbar navbar-light bg-white shadow-sm px-4">
         <a class="navbar-brand fw-bold" href="index.html">Clinic PMS</a>
-
     </nav>
 
     <div class="login-box">
         <ul class="nav nav-tabs role-tabs mb-3" id="roleTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="receptionist-tab" data-bs-toggle="tab" data-bs-target="#receptionist"
-                    type="button" role="tab">Receptionist</button>
+                <button class="nav-link active" id="receptionist-tab" data-bs-toggle="tab"
+                    data-bs-target="#receptionist" type="button" role="tab">Receptionist</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button"
@@ -57,48 +56,48 @@
 
         <div class="tab-content">
             <div class="tab-pane fade show active" id="receptionist" role="tabpanel">
-                <form>
+                <form action="receptionist_login.php" method="POST">
                     <div class="mb-3">
                         <label for="emailReceptionist" class="form-label">Email/Username</label>
-                        <input type="text" class="form-control" id="emailReceptionist"
-                            placeholder="Enter your email or username" />
+                        <input type="text" class="form-control" id="emailReceptionist" name="email"
+                            placeholder="Enter your email or username" required />
                     </div>
                     <div class="mb-3">
                         <label for="passwordReceptionist" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="passwordReceptionist"
-                            placeholder="Enter your password" />
+                        <input type="password" class="form-control" id="passwordReceptionist" name="password"
+                            placeholder="Enter your password" required />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
             </div>
 
             <div class="tab-pane fade" id="admin" role="tabpanel">
-                <form>
+                <form action="admin_login.php" method="POST">
                     <div class="mb-3">
                         <label for="emailAdmin" class="form-label">Email/Username</label>
-                        <input type="text" class="form-control" id="emailAdmin"
-                            placeholder="Enter your email or username" />
+                        <input type="text" class="form-control" id="emailAdmin" name="email"
+                            placeholder="Enter your email or username" required />
                     </div>
                     <div class="mb-3">
                         <label for="passwordAdmin" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="passwordAdmin"
-                            placeholder="Enter your password" />
+                        <input type="password" class="form-control" id="passwordAdmin" name="password"
+                            placeholder="Enter your password" required />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
             </div>
 
             <div class="tab-pane fade" id="doctor" role="tabpanel">
-                <form>
+                <form action="doctor_login.php" method="POST">
                     <div class="mb-3">
                         <label for="emailDoctor" class="form-label">Email/Username</label>
-                        <input type="text" class="form-control" id="emailDoctor"
-                            placeholder="Enter your email or username" />
+                        <input type="text" class="form-control" id="emailDoctor" name="email"
+                            placeholder="Enter your email or username" required />
                     </div>
                     <div class="mb-3">
                         <label for="passwordDoctor" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="passwordDoctor"
-                            placeholder="Enter your password" />
+                        <input type="password" class="form-control" id="passwordDoctor" name="password"
+                            placeholder="Enter your password" required />
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
@@ -110,8 +109,8 @@
         <div>
             <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
             <div class="d-flex justify-content-center align-items-center gap-3">
-                <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150" height="auto">
-                <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60" height="auto">
+                <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150">
+                <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60">
             </div>
         </div>
     </footer>

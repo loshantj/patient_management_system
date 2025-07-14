@@ -1,9 +1,9 @@
 <?php
 require 'db.php';
-require_once 'assets/qr/phpqrcode.php'; // Make sure this file exists and GD is enabled
+require_once 'assets/qr/phpqrcode.php'; // Ensure GD extension is enabled
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Collect and sanitize input
+    // Sanitize inputs
     $full_name = trim($_POST["full_name"]);
     $email = trim($_POST["email"]);
     $phone = trim($_POST["phone"]);
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // 4. Hash the password
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    // 5. Insert into patients table
+    // 5. Insert patient into database
     $stmt = $pdo->prepare("INSERT INTO patients (full_name, email, phone, nic, dob, gender, address, password)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
@@ -48,19 +48,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $hashed_password
     ]);
 
-    // 6. Get inserted ID
+    // 6. Get inserted patient ID
     $patient_id = $pdo->lastInsertId();
 
-    // 7. Generate QR code
-    $qr_content = "PMSID:$patient_id"; // you can include email or name here if needed
+    // 7. Create JSON for QR code (excluding medical history)
+    $qr_data = [
+        'id' => $patient_id,
+        'name' => $full_name,
+        'dob' => $dob,
+        'email' => $email,
+        'phone' => $phone,
+        'nic' => $nic,
+        'gender' => $gender,
+        'address' => $address
+    ];
+    $qr_content = json_encode($qr_data);
+
+    // 8. Generate QR code image
     $qr_path = "assets/qr/patient_$patient_id.png";
     QRcode::png($qr_content, $qr_path, QR_ECLEVEL_H, 4);
 
-    // 8. Save QR path to DB
+    // 9. Save QR path in the database
     $stmt = $pdo->prepare("UPDATE patients SET qr_code = ? WHERE id = ?");
     $stmt->execute([$qr_path, $patient_id]);
 
-    // 9. Redirect to success page with download/print
+    // 10. Redirect to success page
     header("Location: registration_success.php?id=$patient_id");
     exit();
 }
