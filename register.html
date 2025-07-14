@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #bfd3f0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .form-section {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            max-width: 700px;
+            margin: 3rem auto;
+        }
+
+        .form-section h2 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-white shadow-sm px-4">
+        <a class="navbar-brand fw-bold" href="index.html" aria-label="Go to Clinic PMS Home">Clinic PMS</a>
+    </nav>
+
+    <div class="container">
+        <form action="register.php" method="POST" class="form-section">
+            <h2 class="text-center">Patient Registration</h2>
+            <p class="text-center text-muted">Create your account to access our healthcare services</p>
+
+            <!-- Personal Info -->
+            <div class="section-title"><i class="bi bi-person"></i> Personal Information</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="full_name" class="form-label">Full Name *</label>
+                    <input type="text" class="form-control" name="full_name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input type="tel" class="form-control" name="phone" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email Address *</label>
+                    <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="nic" class="form-label">NIC/ID Number</label>
+                    <input type="text" class="form-control" name="nic">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dob" class="form-label">Date of Birth *</label>
+                    <input type="date" class="form-control" name="dob" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label d-block">Gender *</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" value="Male" required>
+                        <label class="form-check-label">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" value="Female" required>
+                        <label class="form-check-label">Female</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" value="Other" required>
+                        <label class="form-check-label">Other</label>
+                    </div>
+                </div>
+                <div class="col-12 mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" name="address" rows="2"></textarea>
+                </div>
+            </div>
+
+            <!-- Account Security -->
+            <div class="section-title"><i class="bi bi-shield-lock"></i> Account Security</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label">Password *</label>
+                    <input type="password" class="form-control" name="password" required minlength="8">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="confirm_password" class="form-label">Confirm Password *</label>
+                    <input type="password" class="form-control" name="confirm_password" required minlength="8">
+                </div>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms">I agree to the <a href="#">Terms of Service</a> and <a
+                        href="#">Privacy Policy</a></label>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">➕ Create Account</button>
+            </div>
+
+            <div class="text-center mt-3">
+                Already have an account? <a href="patient_login.html">Sign in here</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-2 bg-white shadow-sm px-4 mt-5">
+        <div>
+            <p class="mb-2">Powered by <strong>EDIC UOK</strong></p>
+            <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                <a href="https://science.kln.ac.lk/units/edaic/" target="_blank" aria-label="EDIC Website">
+                    <img src="assets/img/edic-logo.png" alt="EDIC Logo" width="150">
+                </a>
+                <a href="https://www.kln.ac.lk/" target="_blank" aria-label="University of Kelaniya">
+                    <img src="assets/img/uok-logo.png" alt="UOK Logo" width="60">
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
