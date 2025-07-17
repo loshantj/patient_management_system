@@ -1,58 +1,48 @@
 <?php
 require 'db.php';
 
-if (!isset($_GET['id'])) {
-    die("Invalid request.");
+if (!isset($_GET['pid'])) {
+    die("Missing patient ID.");
 }
+$patient_code = $_GET['pid'];
 
-$patient_id = $_GET['id'];
-
-// Fetch patient info including QR code path
-$stmt = $pdo->prepare("SELECT full_name, qr_code FROM patients WHERE id = ?");
-$stmt->execute([$patient_id]);
+// Fetch patient by the custom patient_id
+$stmt = $pdo->prepare("SELECT * FROM patients WHERE patient_id = ?");
+$stmt->execute([$patient_code]);
 $patient = $stmt->fetch();
 
 if (!$patient) {
     die("Patient not found.");
 }
+
+$qr_path = $patient['qr_code'];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Registration Success</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Registration Successful</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f9ff; }
+        .container { max-width: 420px; margin: 40px auto; padding: 2rem; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.09);}
+        .qr-code { display: block; margin: 16px auto; width: 180px; border: 1px solid #eee; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-light">
-  <div class="container mt-5 text-center">
-    <div class="bg-white p-4 rounded shadow" style="max-width: 500px; margin: auto;">
-      <h3 class="mb-3 text-success">🎉 Registration Successful</h3>
-      <p class="lead">Welcome, <strong><?= htmlspecialchars($patient['full_name']) ?></strong></p>
-      <p>Your patient QR code is below. You can print or download it for your future visits.</p>
+<body>
+<div class="container text-center">
+    <h2 class="mb-2">Registration Successful!</h2>
+    <h5 class="mb-4 text-success"><?= htmlspecialchars($patient['full_name']) ?></h5>
+    <p class="fw-bold">Patient ID: <span class="text-primary"><?= htmlspecialchars($patient['patient_id']) ?></span></p>
 
-      <!-- Display QR Code -->
-      <img src="<?= htmlspecialchars($patient['qr_code']) ?>" alt="QR Code" width="200" id="qrImage" class="my-3">
+    <img src="<?= htmlspecialchars($qr_path) ?>" alt="Patient QR" class="qr-code mb-2">
 
-      <!-- Download and Print Buttons -->
-      <div class="d-flex justify-content-center gap-3">
-        <a href="<?= htmlspecialchars($patient['qr_code']) ?>" download class="btn btn-primary">
-          ⬇️ Download
-        </a>
-        <button class="btn btn-outline-secondary" onclick="printQRCode()">🖨️ Print</button>
-      </div>
-
-      <a href="patient_login.html" class="btn btn-link mt-4">Go to Login</a>
+    <div class="d-grid gap-2 mb-3">
+        <a href="<?= htmlspecialchars($qr_path) ?>" download class="btn btn-outline-primary">Download QR</a>
+        <button onclick="window.print()" class="btn btn-outline-secondary">Print This Page</button>
     </div>
-  </div>
-
-  <script>
-    function printQRCode() {
-      const win = window.open();
-      win.document.write('<img src="<?= htmlspecialchars($patient['qr_code']) ?>" width="300">');
-      win.print();
-      win.close();
-    }
-  </script>
+    <a href="patient_login.html" class="btn btn-primary mt-2">Go to Login</a>
+</div>
 </body>
 </html>
