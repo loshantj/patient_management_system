@@ -7,72 +7,89 @@ if (!isset($_SESSION['doctor_id'])) {
     exit();
 }
 
-$doctorId = $_SESSION['doctor_id'];
-$doctorName = $_SESSION['doctor_name'];
-$today = date('Y-m-d');
+$doctorId   = $_SESSION['doctor_id'];
+$doctorName = $_SESSION['doctor_name'] ?? 'Doctor';
+$today      = date('Y-m-d');
 
-// Get current pending appointment
-$stmt = $pdo->prepare("SELECT a.*, p.full_name, p.gender, p.dob, p.phone, p.address, p.email 
-                       FROM appointments a 
-                       JOIN patients p ON a.patient_id = p.id 
-                       WHERE a.doctor_id = ? AND a.appointment_date = ? AND a.status = 'pending' 
-                       ORDER BY a.appointment_time ASC 
-                       LIMIT 1");
+// Fetch current pending appointment
+$stmt = $pdo->prepare("
+    SELECT a.*, p.full_name, p.gender, p.dob, p.phone, p.address, p.email 
+    FROM appointments a
+    JOIN patients p ON a.patient_id = p.id
+    WHERE a.doctor_id = ? AND a.appointment_date = ? AND a.status = 'pending'
+    ORDER BY a.appointment_time ASC
+    LIMIT 1
+");
 $stmt->execute([$doctorId, $today]);
-$current = $stmt->fetch();
+$current = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Count total and completed appointments
-$totalPatients = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND appointment_date = ?");
-$totalPatients->execute([$doctorId, $today]);
-$total = $totalPatients->fetchColumn();
+// Count total and completed
+$totalStmt = $pdo->prepare("
+    SELECT COUNT(*) FROM appointments 
+    WHERE doctor_id = ? AND appointment_date = ?
+");
+$totalStmt->execute([$doctorId, $today]);
+$total = $totalStmt->fetchColumn();
 
-$completedPatients = $pdo->prepare("SELECT COUNT(*) FROM appointments WHERE doctor_id = ? AND appointment_date = ? AND status = 'completed'");
-$completedPatients->execute([$doctorId, $today]);
-$completed = $completedPatients->fetchColumn();
+$completedStmt = $pdo->prepare("
+    SELECT COUNT(*) FROM appointments 
+    WHERE doctor_id = ? AND appointment_date = ? AND status = 'completed'
+");
+$completedStmt->execute([$doctorId, $today]);
+$completed = $completedStmt->fetchColumn();
 
-// Next patient
+// Fetch next patient
 $next = null;
 if ($current) {
-    $stmtNext = $pdo->prepare("SELECT a.*, p.full_name FROM appointments a 
-                               JOIN patients p ON a.patient_id = p.id 
-                               WHERE a.doctor_id = ? AND a.appointment_date = ? AND a.status = 'pending' AND a.id != ? 
-                               ORDER BY a.appointment_time ASC LIMIT 1");
-    $stmtNext->execute([$doctorId, $today, $current['id']]);
-    $next = $stmtNext->fetch();
+    $nextStmt = $pdo->prepare("
+        SELECT a.*, p.full_name 
+        FROM appointments a
+        JOIN patients p ON a.patient_id = p.id
+        WHERE a.doctor_id = ? AND a.appointment_date = ? AND a.status = 'pending' AND a.id != ?
+        ORDER BY a.appointment_time ASC
+        LIMIT 1
+    ");
+    $nextStmt->execute([$doctorId, $today, $current['id']]);
+    $next = $nextStmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Fetch previous notes (excluding current appointment)
+// Fetch previous completed notes for this patient
 $previousNotes = [];
 if ($current) {
-    $noteQuery = $pdo->prepare("SELECT appointment_date, notes 
-                                FROM appointments 
-                                WHERE patient_id = ? AND status = 'completed' AND appointment_date < ? 
-                                ORDER BY appointment_date DESC");
-    $noteQuery->execute([$current['patient_id'], $today]);
-    $previousNotes = $noteQuery->fetchAll();
+    $notesStmt = $pdo->prepare("
+        SELECT appointment_date, notes
+        FROM appointments
+        WHERE patient_id = ? AND status = 'completed' AND appointment_date < ?
+        ORDER BY appointment_date DESC
+    ");
+    $notesStmt->execute([$current['patient_id'], $today]);
+    $previousNotes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Handle form submission
+// Handle consultation form POST
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
-    $diagnosis = trim($_POST['diagnosis']);
+    $diagnosis    = trim($_POST['diagnosis']);
     $prescription = trim($_POST['prescription']);
-    $treatment = trim($_POST['treatment']);
-    $notes = "Diagnosis: $diagnosis\nPrescription: $prescription\nTreatment: $treatment";
+    $treatment    = trim($_POST['treatment']);
+    $notes        = "Diagnosis: $diagnosis\nPrescription: $prescription\nTreatment: $treatment";
 
-    $update = $pdo->prepare("UPDATE appointments SET notes = ?, status = 'completed' WHERE id = ?");
-    $update->execute([$notes, $_POST['appointment_id']]);
+    $updateStmt = $pdo->prepare("
+        UPDATE appointments
+        SET notes = ?, status = 'completed'
+        WHERE id = ?
+    ");
+    $updateStmt->execute([$notes, $_POST['appointment_id']]);
 
     header("Location: dashboard.php");
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Doctor Dashboard - Clinic PMS</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { background-color: #f5f9ff; }
     .sidebar { background-color: #fff; min-height: 100vh; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
@@ -88,15 +105,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
     <!-- Sidebar -->
     <div class="col-md-2 sidebar py-4 px-3">
       <div class="text-center mb-4">
-        <img src="../assets/img/doctor1.jpg" class="rounded-circle" width="0" />
+        <img src="../assets/img/doctor1.jpg" class="rounded-circle" width="80" alt="Doctor">
         <h5 class="mt-2"><?= htmlspecialchars($doctorName) ?></h5>
         <p class="text-muted mb-0">Doctor</p>
       </div>
+      <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
       <ul class="nav flex-column">
-        <li class="nav-item mb-2"><a href="#" class="nav-link text-primary fw-semibold">🧑‍⚕️ My Patients</a></li>
-        <li class="nav-item mb-2"><a href="#" class="nav-link">📅 Appointments Today</a></li>
-        <li class="nav-item mb-2"><a href="#" class="nav-link">📁 Medical History</a></li>
-        <li class="nav-item mt-3"><a href="../logout.php" class="btn btn-outline-danger w-100">Logout</a></li>
+        <li class="nav-item mb-2">
+          <a href="dashboard.php"
+             class="nav-link <?= $currentPage==='dashboard.php' ? 'text-primary fw-semibold' : '' ?>">
+            🧑‍⚕️ My Patients
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a href="availability.php"
+             class="nav-link <?= $currentPage==='availability.php' ? 'text-primary fw-semibold' : '' ?>">
+            ⏰ Manage Availability
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a href="#" class="nav-link">📅 Appointments Today</a>
+        </li>
+        <li class="nav-item mb-2">
+          <a href="#" class="nav-link">📁 Medical History</a>
+        </li>
+        <li class="nav-item mt-3">
+          <a href="../logout.php" class="btn btn-outline-danger w-100">Logout</a>
+        </li>
       </ul>
     </div>
 
@@ -106,7 +141,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
         <div class="col-md-3">
           <div class="card p-3">
             <h5 class="card-title text-muted">Current Queue</h5>
-            <h4><?= $current ? "#{$current['id']}<br><small class='text-secondary'>{$current['full_name']}</small>" : "No patient" ?></h4>
+            <h4>
+              <?= $current
+                  ? "#{$current['id']}<br><small class='text-secondary'>{$current['full_name']}</small>"
+                  : "No patient" ?>
+            </h4>
           </div>
         </div>
         <div class="col-md-3">
@@ -124,7 +163,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
         <div class="col-md-3">
           <div class="card p-3">
             <h5 class="card-title text-muted">Next Patient</h5>
-            <h4><?= $next ? "{$next['full_name']}<br><small class='text-secondary'>{$next['appointment_time']}</small>" : "N/A" ?></h4>
+            <h4>
+              <?= $next
+                  ? "{$next['full_name']}<br><small class='text-secondary'>{$next['appointment_time']}</small>"
+                  : "N/A" ?>
+            </h4>
           </div>
         </div>
       </div>
@@ -135,17 +178,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
         <div class="col-md-5">
           <div class="card p-3">
             <h5 class="fw-bold"><?= htmlspecialchars($current['full_name']) ?></h5>
-            <p class="mb-1"><?= $current['gender'] ?> | <?= date_diff(date_create($current['dob']), date_create('today'))->y ?> yrs</p>
-            <p class="mb-1">Appointed: <?= $current['appointment_time'] ?></p>
-            <p class="mb-1"><strong>📞</strong> <?= $current['phone'] ?></p>
-            <p class="mb-1"><strong>📍</strong> <?= $current['address'] ?></p>
+            <p class="mb-1">
+              <?= htmlspecialchars($current['gender']) ?> |
+              <?= date_diff(
+                    date_create($current['dob']),
+                    date_create('today')
+                  )->y ?> yrs
+            </p>
+            <p class="mb-1">Appointed: <?= htmlspecialchars($current['appointment_time']) ?></p>
+            <p class="mb-1"><strong>📞</strong> <?= htmlspecialchars($current['phone']) ?></p>
+            <p class="mb-1"><strong>📍</strong> <?= htmlspecialchars($current['address']) ?></p>
             <p class="mb-1"><strong>Reason:</strong> <?= htmlspecialchars($current['reason']) ?></p>
             <hr>
             <h6 class="fw-semibold">Previous Notes:</h6>
             <ul class="text-muted small">
-              <?php if (count($previousNotes) > 0): ?>
+              <?php if ($previousNotes): ?>
                 <?php foreach ($previousNotes as $note): ?>
-                  <li><strong><?= $note['appointment_date'] ?>:</strong> <?= nl2br(htmlspecialchars($note['notes'])) ?></li>
+                  <li>
+                    <strong><?= htmlspecialchars($note['appointment_date']) ?>:</strong>
+                    <?= nl2br(htmlspecialchars($note['notes'])) ?>
+                  </li>
                 <?php endforeach; ?>
               <?php else: ?>
                 <li>No previous notes found.</li>
@@ -162,11 +214,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['appointment_id'])) {
               <input type="hidden" name="appointment_id" value="<?= $current['id'] ?>">
               <div class="mb-3">
                 <label>Diagnosis</label>
-                <input type="text" class="form-control" name="diagnosis" required />
+                <input type="text" class="form-control" name="diagnosis" required>
               </div>
               <div class="mb-3">
                 <label>Prescription</label>
-                <input type="text" class="form-control" name="prescription" required />
+                <input type="text" class="form-control" name="prescription" required>
               </div>
               <div class="mb-3">
                 <label>Treatment Plan</label>

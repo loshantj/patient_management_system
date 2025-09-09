@@ -2,63 +2,63 @@
 require 'db.php';
 session_start();
 
-// 1) Ensure patient is logged in
-if (!isset($_SESSION['patient_id'])) {
-    header("Location: patient_login.html");
-    exit();
+// 1. Collect form data
+$patientCode     = trim($_POST['patient_id'] ?? '');
+$appointmentDate = $_POST['appointment_date'] ?? '';
+$doctorId        = $_POST['doctor_id'] ?? '';
+$appointmentTime = $_POST['appointment_time'] ?? '';
+$reason          = trim($_POST['reason'] ?? '');
+
+// 2. Basic validation
+if (!$patientCode || !$appointmentDate || !$appointmentTime) {
+    die("Please fill out Patient ID, date, and time.");
 }
 
-$patient_id = $_SESSION['patient_id'];
+// 3. Confirm patient exists by custom patient_id
+$stmt = $pdo->prepare("SELECT id FROM patients WHERE patient_id = ?");
+$stmt->execute([$patientCode]);
+$patientId = $stmt->fetchColumn();
+if (!$patientId) {
+    die("Invalid Patient ID.");
+}
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $doctor_id        = $_POST['doctor_id'] ?? '';
-    $appointment_date = $_POST['appointment_date'] ?? '';
-    $appointment_time = $_POST['appointment_time'] ?? '';
-    $reason           = trim($_POST['reason'] ?? '');
-
-    // 2) Validate
-    if (!$appointment_date || !$appointment_time) {
-        die("Please select both date and time.");
-    }
-
-    // 3) Auto-assign doctor if "auto" selected
-    if ($doctor_id === "auto" || $doctor_id === '') {
-        $stmt = $pdo->prepare("
-            SELECT d.id
-            FROM doctors d
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM appointments a
-                WHERE a.doctor_id = d.id
-                  AND a.appointment_date = ?
-                  AND a.appointment_time = ?
-            )
-            LIMIT 1
-        ");
-        $stmt->execute([$appointment_date, $appointment_time]);
-        $doctor_id = $stmt->fetchColumn();
-        if (!$doctor_id) {
-            die("No doctors available at the selected time.");
-        }
-    }
-
-    // 4) Insert WITHOUT specifying the `id` column
+// 4. Auto‐assign doctor if needed
+if ($doctorId === 'auto' || !$doctorId) {
     $stmt = $pdo->prepare("
-        INSERT INTO appointments 
-          (patient_id, doctor_id, appointment_date, appointment_time, reason, status)
-        VALUES 
-          (?, ?, ?, ?, ?, 'pending')
+        SELECT d.id
+        FROM doctors d
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM appointments a
+            WHERE a.doctor_id = d.id
+              AND a.appointment_date = ?
+              AND a.appointment_time = ?
+        )
+        LIMIT 1
     ");
-    $stmt->execute([
-        $patient_id,
-        $doctor_id,
-        $appointment_date,
-        $appointment_time,
-        $reason
-    ]);
+    $stmt->execute([$appointmentDate, $appointmentTime]);
+    $doctorId = $stmt->fetchColumn();
 
-    // 5) Redirect to patient dashboard
-    header("Location: patient/dashboard.php");
-    exit();
+    if (!$doctorId) {
+        die("No doctors available at the selected time.");
+    }
 }
+
+// 5. Insert the appointment (status defaults to 'pending')
+$stmt = $pdo->prepare("
+    INSERT INTO appointments
+      (patient_id, doctor_id, appointment_date, appointment_time, reason, status)
+    VALUES (?, ?, ?, ?, ?, 'pending')
+");
+$stmt->execute([
+    $patientId,
+    $doctorId,
+    $appointmentDate,
+    $appointmentTime,
+    $reason
+]);
+
+// 6. Redirect to patient dashboard
+header("Location: patient/dashboard.php");
+exit();
 ?>

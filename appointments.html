@@ -17,7 +17,7 @@
         }
 
         .container {
-            background-color: white;
+            background: white;
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -34,29 +34,6 @@
             margin-top: 1rem;
         }
 
-        .input-with-button {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .input-with-button input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        .qr-btn {
-            padding: 8px 10px;
-            border: none;
-            background-color: #1a3fc3;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
         input,
         select,
         textarea {
@@ -67,20 +44,35 @@
             border-radius: 6px;
         }
 
+        .input-with-button {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .qr-btn {
+            background: #1a3fc3;
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
         .submit-btn {
             margin-top: 20px;
-            background-color: #1a3fc3;
-            color: white;
+            background: #1a3fc3;
+            color: #fff;
             font-weight: bold;
             padding: 10px;
-            width: 100%;
             border: none;
             border-radius: 6px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            cursor: pointer;
         }
 
         #qr-modal {
@@ -119,27 +111,22 @@
 
     <div class="container">
         <h2>Book Appointment</h2>
-
-        <form action="appointments.php" method="POST">
+        <form id="appt-form" action="appointments.php" method="POST">
             <!-- Patient -->
             <label for="patient-search">Patient ID or QR Scan</label>
             <div class="input-with-button">
-                <input type="text" id="patient-search" name="patient_id" required placeholder="Scan QR or enter ID" />
+                <input type="text" id="patient-search" name="patient_id" required placeholder="Scan QR or enter ID">
                 <button type="button" class="qr-btn" id="qr-scan-btn" title="Scan QR">📷</button>
             </div>
 
             <!-- Date -->
             <label for="appointment-date">Appointment Date</label>
-            <input type="date" id="appointment-date" name="appointment_date" required />
+            <input type="date" id="appointment-date" name="appointment_date" required>
 
-            <!-- Doctor -->
+            <!-- Doctor (dynamic) -->
             <label for="doctor">Select Doctor</label>
             <select id="doctor" name="doctor_id" required>
-                <option value="">-- Choose a Doctor --</option>
                 <option value="auto">Auto-Assign</option>
-                <option value="1">Dr. John</option>
-                <option value="2">Dr. Chan</option>
-                <option value="3">Dr. Joseph</option>
             </select>
 
             <!-- Time -->
@@ -152,84 +139,102 @@
             <label for="reason">Reason for Visit</label>
             <textarea id="reason" name="reason" rows="3" placeholder="E.g. Headache, fever, etc." required></textarea>
 
-            <button type="submit" class="submit-btn">
-                <span>📅</span> Book Appointment
-            </button>
+            <button type="submit" class="submit-btn">📅 Book Appointment</button>
         </form>
     </div>
 
     <!-- QR Scanner Modal -->
     <div id="qr-modal">
         <div class="content">
-            <div id="qr-reader" style="width: 100%"></div>
             <button class="close" onclick="closeQRScanner()">&times;</button>
+            <div id="qr-reader" style="width:100%"></div>
         </div>
     </div>
 
     <script>
-        const qrBtn = document.getElementById("qr-scan-btn");
-        const qrModal = document.getElementById("qr-modal");
-        const qrInput = document.getElementById("patient-search");
-        let html5QrCode;
-
-        qrBtn.addEventListener("click", () => {
-            qrModal.style.display = "block";
+        // QR scanning
+        let html5QrCode,
+            qrInput = document.getElementById('patient-search');
+        document.getElementById('qr-scan-btn').onclick = () => {
+            document.getElementById('qr-modal').style.display = 'block';
             html5QrCode = new Html5Qrcode("qr-reader");
             html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: 250 },
-                (decodedText) => {
+                decodedText => {
                     qrInput.value = decodedText;
-                    html5QrCode.stop().then(() => {
-                        qrModal.style.display = "none";
-                    }).catch(err => console.error(err));
+                    html5QrCode.stop().then(() => document.getElementById('qr-modal').style.display = 'none');
                 },
-                (err) => { }
-            ).catch(err => {
-                console.error("QR start failed", err);
-            });
-        });
-
+                err => { }
+            ).catch(console.error);
+        };
         function closeQRScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    qrModal.style.display = "none";
-                }).catch(err => console.error("Stop error:", err));
-            } else {
-                qrModal.style.display = "none";
-            }
+            if (html5QrCode) html5QrCode.stop().then(() => document.getElementById('qr-modal').style.display = 'none');
+            else document.getElementById('qr-modal').style.display = 'none';
         }
 
-        // Load available slots on doctor or date change
-        document.getElementById("doctor").addEventListener("change", loadSlots);
-        document.getElementById("appointment-date").addEventListener("change", loadSlots);
+        // Helper to fetch JSON
+        function fetchJSON(url) {
+            return fetch(url).then(r => r.ok ? r.json() : Promise.reject(r.statusText));
+        }
 
-        function loadSlots() {
-            const doctorId = document.getElementById("doctor").value;
-            const date = document.getElementById("appointment-date").value;
-            const timeSelect = document.getElementById("appointment-time");
+        // 1) Load doctors when date changes
+        document.getElementById('appointment-date').addEventListener('change', () => {
+            const date = document.getElementById('appointment-date').value,
+                docSel = document.getElementById('doctor'),
+                timeSel = document.getElementById('appointment-time');
 
-            if (doctorId === "auto" || !doctorId || !date) {
-                timeSelect.innerHTML = '<option value="">Select date and doctor</option>';
+            // Reset
+            docSel.innerHTML = '<option value="auto">Auto-Assign</option>';
+            timeSel.innerHTML = '<option value="">Select date and doctor</option>';
+
+            if (!date) return;
+
+            fetchJSON(`get_available_doctors.php?date=${encodeURIComponent(date)}`)
+                .then(doctors => {
+                    doctors.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.id;
+                        opt.textContent = d.full_name;
+                        docSel.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading doctors:', err);
+                    alert('Could not load available doctors.');
+                });
+        });
+
+        // 2) Load slots when doctor changes
+        document.getElementById('doctor').addEventListener('change', () => {
+            const date = document.getElementById('appointment-date').value,
+                doc = document.getElementById('doctor').value,
+                timeSel = document.getElementById('appointment-time');
+
+            timeSel.innerHTML = '';
+            if (!date || !doc || doc === 'auto') {
+                timeSel.innerHTML = '<option value="">Select date and doctor</option>';
                 return;
             }
 
-            fetch(`get_available_slots.php?doctor_id=${doctorId}&date=${date}`)
-                .then(res => res.json())
+            fetchJSON(`get_available_slots.php?doctor_id=${doc}&date=${encodeURIComponent(date)}`)
                 .then(slots => {
-                    timeSelect.innerHTML = "";
-                    if (slots.length === 0) {
-                        timeSelect.innerHTML = '<option value="">No slots available</option>';
-                    } else {
-                        slots.forEach(slot => {
-                            const option = document.createElement("option");
-                            option.value = slot;
-                            option.textContent = slot;
-                            timeSelect.appendChild(option);
-                        });
+                    if (!slots.length) {
+                        timeSel.innerHTML = '<option value="">No slots available</option>';
+                        return;
                     }
+                    slots.forEach(s => {
+                        const o = document.createElement('option');
+                        o.value = s;
+                        o.textContent = s;
+                        timeSel.appendChild(o);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error loading slots:', err);
+                    timeSel.innerHTML = '<option value="">Error loading slots</option>';
                 });
-        }
+        });
     </script>
 </body>
 
