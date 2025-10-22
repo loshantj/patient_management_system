@@ -13,14 +13,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt = $pdo->prepare("SELECT * FROM patients WHERE email = ?");
         $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
-            // 1. Store integer ID & name in session
+            // ✅ Store patient info in session
             $_SESSION['patient_id']   = $user['id'];
             $_SESSION['patient_name'] = $user['full_name'];
+            $_SESSION['role']         = 'patient';   // 👈 important for header.php
 
-            // 2. Redirect to PHP dashboard
+            // Redirect to Patient Dashboard
             header("Location: patient/dashboard.php");
             exit();
         } else {
@@ -29,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,11 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST" action="">
       <div class="mb-3">
         <label class="form-label">Email address</label>
-        <input type="email" name="email" class="form-control" required placeholder="Enter email">
+        <input type="email" name="email" class="form-control" required placeholder="Enter email" autocomplete="username">
       </div>
       <div class="mb-3">
         <label class="form-label">Password</label>
-        <input type="password" name="password" class="form-control" required placeholder="Enter password">
+        <input type="password" name="password" class="form-control" required placeholder="Enter password" autocomplete="current-password">
       </div>
       <button type="submit" class="btn btn-primary w-100">Login</button>
     </form>

@@ -1,13 +1,14 @@
 <?php
-$host = 'localhost';
-$db = 'clinic_pms';
-$user = 'root'; // or your DB user
-$pass = '';     // or your DB password
+$host = "localhost";      
+$dbname = "clinic_pms";   
+$user = "root";           
+$pass = "";               
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // echo "Database connected successfully!";
 } catch (PDOException $e) {
-    die("DB Connection failed: " . $e->getMessage());
+    echo "DB Connection failed: " . $e->getMessage();
 }
 ?>

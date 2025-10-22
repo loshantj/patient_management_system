@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Patient Registration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <style>
         body {
             background-color: #bfd3f0;
@@ -16,7 +17,7 @@
             background: #fff;
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .05);
             max-width: 700px;
             margin: 3rem auto;
         }
@@ -28,51 +29,76 @@
 
         .section-title {
             font-size: 1.2rem;
-            margin: 1.5rem 0 0.5rem;
+            margin: 1.5rem 0 .5rem;
             font-weight: 500;
             color: #2c3e50;
             border-bottom: 1px solid #dee2e6;
-            padding-bottom: 0.5rem;
+            padding-bottom: .5rem;
+        }
+
+        /* Show a red outline for the radio group when invalid */
+        #genderGroup.is-invalid {
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            padding: .5rem .75rem;
         }
     </style>
 </head>
 
 <body>
-
     <!-- Navigation -->
     <nav class="navbar navbar-light bg-white shadow-sm px-4">
         <a class="navbar-brand fw-bold" href="index.html" aria-label="Go to Clinic PMS Home">Clinic PMS</a>
     </nav>
 
     <div class="container">
-        <form action="register.php" method="POST" class="form-section">
+        <form action="register.php" method="POST" class="form-section" id="registrationForm" novalidate>
             <h2 class="text-center">Patient Registration</h2>
             <p class="text-center text-muted">Create your account to access our healthcare services</p>
 
+            <!-- Global error (filled by JS if errors.__global exists) -->
+            <div id="formError" class="alert alert-danger d-none"></div>
+
             <!-- Personal Info -->
-            <div class="section-title"><i class="bi bi-person"></i> Personal Information</div>
+            <div class="section-title">Personal Information</div>
             <div class="row">
+                <!-- Full Name -->
                 <div class="col-md-6 mb-3">
-                    <label for="full_name" class="form-label">Full Name *</label>
+                    <label class="form-label">Full Name *</label>
                     <input type="text" class="form-control" name="full_name" required>
+                    <div class="invalid-feedback">Full name is required.</div>
                 </div>
+
+                <!-- Phone -->
                 <div class="col-md-6 mb-3">
-                    <label for="phone" class="form-label">Phone Number *</label>
+                    <label class="form-label">Phone Number *</label>
                     <input type="tel" class="form-control" name="phone" required>
+                    <div class="invalid-feedback">Phone number is required.</div>
                 </div>
+
+                <!-- Email -->
                 <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Email Address *</label>
+                    <label class="form-label">Email Address *</label>
                     <input type="email" class="form-control" name="email" required>
+                    <div class="invalid-feedback">Valid email is required.</div>
                 </div>
+
+                <!-- NIC -->
                 <div class="col-md-6 mb-3">
-                    <label for="nic" class="form-label">NIC/ID Number</label>
+                    <label class="form-label">NIC/ID Number</label>
                     <input type="text" class="form-control" name="nic">
+                    <div class="invalid-feedback"></div>
                 </div>
+
+                <!-- DOB -->
                 <div class="col-md-6 mb-3">
-                    <label for="dob" class="form-label">Date of Birth *</label>
+                    <label class="form-label">Date of Birth *</label>
                     <input type="date" class="form-control" name="dob" required>
+                    <div class="invalid-feedback">Date of birth is required.</div>
                 </div>
-                <div class="col-md-6 mb-3">
+
+                <!-- Gender (radio group) -->
+                <div class="col-md-6 mb-3" id="genderGroup">
                     <label class="form-label d-block">Gender *</label>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="gender" value="Male" required>
@@ -86,30 +112,42 @@
                         <input class="form-check-input" type="radio" name="gender" value="Other" required>
                         <label class="form-check-label">Other</label>
                     </div>
+                    <div class="invalid-feedback d-block">Please select a gender.</div>
                 </div>
+
+                <!-- Address -->
                 <div class="col-12 mb-3">
-                    <label for="address" class="form-label">Address</label>
+                    <label class="form-label">Address</label>
                     <textarea class="form-control" name="address" rows="2"></textarea>
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
 
             <!-- Account Security -->
-            <div class="section-title"><i class="bi bi-shield-lock"></i> Account Security</div>
+            <div class="section-title">Account Security</div>
             <div class="row">
+                <!-- Password -->
                 <div class="col-md-6 mb-3">
-                    <label for="password" class="form-label">Password *</label>
+                    <label class="form-label">Password *</label>
                     <input type="password" class="form-control" name="password" required minlength="8">
+                    <div class="invalid-feedback">Password must be at least 8 characters.</div>
                 </div>
+                <!-- Confirm Password -->
                 <div class="col-md-6 mb-3">
-                    <label for="confirm_password" class="form-label">Confirm Password *</label>
+                    <label class="form-label">Confirm Password *</label>
                     <input type="password" class="form-control" name="confirm_password" required minlength="8">
+                    <div class="invalid-feedback">Passwords do not match.</div>
                 </div>
             </div>
 
+            <!-- Terms -->
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="terms" required>
-                <label class="form-check-label" for="terms">I agree to the <a href="#">Terms of Service</a> and <a
-                        href="#">Privacy Policy</a></label>
+                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#" target="_blank">Terms of Service</a> and
+                    <a href="#" target="_blank">Privacy Policy</a>
+                </label>
+                <div class="invalid-feedback d-block">You must agree to continue.</div>
             </div>
 
             <div class="d-grid">
@@ -138,6 +176,82 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Read ?errors=...&old=... and paint fields red -->
+    <script>
+        (function () {
+            function getJSONParam(name) {
+                const params = new URLSearchParams(window.location.search);
+                const b64 = params.get(name);
+                if (!b64) return null;
+                try {
+                    const norm = b64.replace(/-/g, '+').replace(/_/g, '/');
+                    const pad = '==='.slice((norm.length + 3) % 4);
+                    const json = atob(norm + pad);
+                    return JSON.parse(json);
+                } catch (e) { return null; }
+            }
+            const errors = getJSONParam('errors') || {};
+            const old = getJSONParam('old') || {};
+
+            // Fill old values
+            Object.entries(old).forEach(([name, val]) => {
+                if (name === 'gender') {
+                    const r = document.querySelector(`input[name="gender"][value="${CSS.escape(val)}"]`);
+                    if (r) r.checked = true;
+                } else {
+                    const el = document.querySelector(`[name="${CSS.escape(name)}"]`);
+                    if (el && el.tagName.match(/INPUT|TEXTAREA|SELECT/)) el.value = val ?? '';
+                }
+            });
+
+            // Apply invalid states + messages
+            Object.entries(errors).forEach(([name, msg]) => {
+                if (name === '__global') {
+                    const alert = document.getElementById('formError');
+                    if (alert) { alert.textContent = msg; alert.classList.remove('d-none'); }
+                    return;
+                }
+                if (name === 'gender') {
+                    const g = document.getElementById('genderGroup');
+                    if (g) {
+                        g.classList.add('is-invalid');
+                        const label = g.querySelector('.form-label'); if (label) label.classList.add('text-danger');
+                        const fb = g.querySelector('.invalid-feedback'); if (fb) fb.textContent = msg;
+                    }
+                    return;
+                }
+                const input = document.querySelector(`[name="${CSS.escape(name)}"]`);
+                if (!input) return;
+                input.classList.add('is-invalid');
+                const label = input.closest('.mb-3')?.querySelector('.form-label');
+                if (label) label.classList.add('text-danger');
+                const fb = input.nextElementSibling;
+                if (fb && fb.classList.contains('invalid-feedback')) fb.textContent = msg || fb.textContent;
+            });
+
+            // Clear query string after applying (prevents repeat on refresh)
+            if (window.location.search.includes('errors=')) {
+                history.replaceState({}, "", window.location.pathname);
+            }
+
+            // Optional: remove red when user edits
+            document.querySelectorAll('.form-control').forEach((el) => {
+                el.addEventListener('input', () => {
+                    el.classList.remove('is-invalid');
+                    const label = el.closest('.mb-3')?.querySelector('.form-label');
+                    if (label) label.classList.remove('text-danger');
+                });
+            });
+            document.querySelectorAll('input[name="gender"]').forEach(r => {
+                r.addEventListener('change', () => {
+                    const g = document.getElementById('genderGroup');
+                    g.classList.remove('is-invalid');
+                    g.querySelector('.form-label').classList.remove('text-danger');
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>
