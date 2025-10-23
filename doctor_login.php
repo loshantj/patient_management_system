@@ -1,6 +1,6 @@
 <?php
 // doctor_login.php
-
+require_once __DIR__ . '/error_handler.php';
 require 'db.php'; // Make sure this file sets up $pdo properly
 session_start();
 

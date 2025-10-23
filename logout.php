@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/error_handler.php';
 // Figure out where to redirect before destroying the session
 $redirect = "patient_login.html"; // default
 

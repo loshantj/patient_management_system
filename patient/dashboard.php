@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/error_handler.php';
 require_once '../db.php'; // Adjust the path if needed
 
 if (!isset($_SESSION['patient_id'])) {

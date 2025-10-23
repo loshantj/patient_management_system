@@ -1,6 +1,7 @@
 <?php
 // register.php — validation + patient creation + QR
 // -------------------------------------------------
+require_once __DIR__ . '/error_handler.php';
 require 'db.php';
 require_once 'assets/qr/phpqrcode.php'; // needs GD extension
 

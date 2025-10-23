@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/error_handler.php';
 require 'db.php';
 
 if (!isset($_GET['pid'])) {
