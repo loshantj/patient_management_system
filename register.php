@@ -5,19 +5,20 @@ require 'db.php';
 require_once 'assets/qr/phpqrcode.php'; // needs GD extension
 
 function b64url_encode_json(array $arr): string {
-  $json = json_encode($arr, JSON_UNESCAPED_SLASHES);
-  $b64  = base64_encode($json);
-  return rtrim(strtr($b64, '+/', '-_'), '=');
+    $json = json_encode($arr, JSON_UNESCAPED_SLASHES);
+    $b64  = base64_encode($json);
+    return rtrim(strtr($b64, '+/', '-_'), '=');
 }
+
 function redirect_with_errors(array $errors, array $old): void {
-  $err_b64 = b64url_encode_json($errors);
-  $old_b64 = b64url_encode_json($old);
-  header("Location: register.html?errors={$err_b64}&old={$old_b64}");
-  exit;
+    $err_b64 = b64url_encode_json($errors);
+    $old_b64 = b64url_encode_json($old);
+    header("Location: register.html?errors={$err_b64}&old={$old_b64}");
+    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Collect & sanitize
+    // Collect & sanitize input
     $full_name = trim($_POST["full_name"] ?? '');
     $email     = trim($_POST["email"] ?? '');
     $phone     = trim($_POST["phone"] ?? '');
@@ -27,19 +28,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $address   = trim($_POST["address"] ?? '');
     $password  = $_POST["password"] ?? '';
     $confirm   = $_POST["confirm_password"] ?? '';
-    $terms     = isset($_POST["terms"]); // checkbox
+    $terms     = isset($_POST["terms"]);
 
     $old = [
-      'full_name' => $full_name,
-      'email'     => $email,
-      'phone'     => $phone,
-      'nic'       => $nic,
-      'dob'       => $dob,
-      'gender'    => $gender,
-      'address'   => $address
+        'full_name' => $full_name,
+        'email'     => $email,
+        'phone'     => $phone,
+        'nic'       => $nic,
+        'dob'       => $dob,
+        'gender'    => $gender,
+        'address'   => $address
     ];
 
-    // Validate
+    // Validate inputs
     $errors = [];
     if ($full_name === '')                               $errors['full_name'] = "Full name is required.";
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Valid email is required.";
@@ -50,35 +51,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($confirm === '' || $password !== $confirm)       $errors['confirm_password'] = "Passwords do not match.";
     if (!$terms)                                         $errors['terms'] = "You must agree to continue.";
 
-    // Email unique check
+    // Email uniqueness check
     if (!isset($errors['email'])) {
-        $stmt = $pdo->prepare("SELECT id FROM patient WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id FROM patients WHERE email = ?");
         $stmt->execute([$email]);
         if ($stmt->fetch()) $errors['email'] = "This email is already registered.";
     }
 
-    // If errors → bounce back with red highlights
+    // Redirect back if errors found
     if (!empty($errors)) redirect_with_errors($errors, $old);
 
     try {
-        // Create patient
+        // Hash password
         $hashed = password_hash($password, PASSWORD_DEFAULT);
 
-        // NOTE: Your table may have patient_id NOT NULL.
-        // If strict SQL mode is ON and patient_id is NOT NULL, either:
-        //  a) allow NULL temporarily, or
-        //  b) precompute a code before insert (we'll do a simple insert-then-update like your original).
+        // Insert patient record
         $stmt = $pdo->prepare("
-            INSERT INTO patient (full_name, email, phone, nic, dob, gender, address, password)
+            INSERT INTO patients (full_name, email, phone, nic, dob, gender, address, password)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([$full_name, $email, $phone, $nic, $dob, $gender, $address, $hashed]);
 
+        // Generate patient code
         $newId = $pdo->lastInsertId();
         $patient_code = 'P' . str_pad((string)$newId, 6, '0', STR_PAD_LEFT);
 
         // Update patient_id
-        $pdo->prepare("UPDATE patient SET patient_id = ? WHERE id = ?")
+        $pdo->prepare("UPDATE patients SET patient_id = ? WHERE id = ?")
             ->execute([$patient_code, $newId]);
 
         // Build QR data
@@ -93,19 +92,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             'address'    => $address
         ], JSON_UNESCAPED_SLASHES);
 
-        // Paths
+        // Prepare QR directory
         $qrDirFs  = __DIR__ . '/assets/qr';
         if (!is_dir($qrDirFs)) { @mkdir($qrDirFs, 0775, true); }
         if (!is_writable($qrDirFs)) {
             redirect_with_errors(['__global' => 'QR folder is not writable.'], $old);
         }
+
+        // Generate QR code
         $qrRel = "assets/qr/{$patient_code}.png";
         $qrFs  = __DIR__ . "/{$qrRel}";
-
-        // Generate QR
         QRcode::png($qr_data, $qrFs, QR_ECLEVEL_H, 4);
 
-        // Add "Patient ID: ..." below QR
+        // Add “Patient ID: ...” text below QR
         $qr_img = imagecreatefrompng($qrFs);
         if (!$qr_img) redirect_with_errors(['__global' => 'Failed to generate QR image.'], $old);
 
@@ -129,20 +128,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         imagedestroy($qr_img);
         imagedestroy($final);
 
-        // Save QR path (relative)
-        $pdo->prepare("UPDATE patient SET qr_code = ? WHERE id = ?")
+        // Save QR code path
+        $pdo->prepare("UPDATE patients SET qr_code = ? WHERE id = ?")
             ->execute([$qrRel, $newId]);
 
-        // Success → go to success page
+        // Redirect to success page
         header("Location: registration_success.php?pid={$patient_code}");
         exit;
 
     } catch (Throwable $e) {
-        // Log internally if desired: error_log($e->getMessage());
+        // Optional: log for debugging
+        // error_log($e->getMessage());
         redirect_with_errors(['__global' => 'An unexpected error occurred. Please try again.'], $old);
     }
+
 } else {
-    // Direct GET access → go back to the form
+    // If direct GET access, go back to form
     header("Location: register.html");
     exit;
 }
+?>
