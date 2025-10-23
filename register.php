@@ -140,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Optional: log for debugging
         // error_log($e->getMessage());
         redirect_with_errors(['__global' => 'An unexpected error occurred. Please try again.'], $old);
+        //die("Error: " . $e->getMessage());
     }
 
 } else {
