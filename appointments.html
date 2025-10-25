@@ -5,7 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Appointment</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -111,7 +113,7 @@
 
     <div class="container">
         <h2>Book Appointment</h2>
-        <form id="appt-form" action="appointments.php" method="POST">
+        <form id="appt-form" method="POST">
             <!-- Patient -->
             <label for="patient-search">Patient ID or QR Scan</label>
             <div class="input-with-button">
@@ -123,10 +125,10 @@
             <label for="appointment-date">Appointment Date</label>
             <input type="date" id="appointment-date" name="appointment_date" required>
 
-            <!-- Doctor (dynamic) -->
+            <!-- Doctor -->
             <label for="doctor">Select Doctor</label>
             <select id="doctor" name="doctor_id" required>
-                <option value="auto">Auto-Assign</option>
+                <option value="">Select date first</option>
             </select>
 
             <!-- Time -->
@@ -152,9 +154,11 @@
     </div>
 
     <script>
-        // QR scanning
-        let html5QrCode,
-            qrInput = document.getElementById('patient-search');
+        console.log("✅ JS Loaded — appointments.html is running");
+
+        // QR Code setup
+        let html5QrCode;
+        const qrInput = document.getElementById('patient-search');
         document.getElementById('qr-scan-btn').onclick = () => {
             document.getElementById('qr-modal').style.display = 'block';
             html5QrCode = new Html5Qrcode("qr-reader");
@@ -164,8 +168,7 @@
                 decodedText => {
                     qrInput.value = decodedText;
                     html5QrCode.stop().then(() => document.getElementById('qr-modal').style.display = 'none');
-                },
-                err => { }
+                }
             ).catch(console.error);
         };
         function closeQRScanner() {
@@ -178,20 +181,22 @@
             return fetch(url).then(r => r.ok ? r.json() : Promise.reject(r.statusText));
         }
 
-        // 1) Load doctors when date changes
+        // Load doctors when date changes
         document.getElementById('appointment-date').addEventListener('change', () => {
             const date = document.getElementById('appointment-date').value,
                 docSel = document.getElementById('doctor'),
                 timeSel = document.getElementById('appointment-time');
 
-            // Reset
-            docSel.innerHTML = '<option value="auto">Auto-Assign</option>';
+            docSel.innerHTML = '<option value="">Loading...</option>';
             timeSel.innerHTML = '<option value="">Select date and doctor</option>';
 
             if (!date) return;
 
             fetchJSON(`get_available_doctors.php?date=${encodeURIComponent(date)}`)
                 .then(doctors => {
+                    docSel.innerHTML = doctors.length
+                        ? '<option value="auto">Auto-Assign</option>'
+                        : '<option value="">No doctors available</option>';
                     doctors.forEach(d => {
                         const opt = document.createElement('option');
                         opt.value = d.id;
@@ -201,28 +206,26 @@
                 })
                 .catch(err => {
                     console.error('Error loading doctors:', err);
-                    alert('Could not load available doctors.');
+                    docSel.innerHTML = '<option value="">Error loading doctors</option>';
                 });
         });
 
-        // 2) Load slots when doctor changes
+        // Load slots when doctor changes
         document.getElementById('doctor').addEventListener('change', () => {
             const date = document.getElementById('appointment-date').value,
                 doc = document.getElementById('doctor').value,
                 timeSel = document.getElementById('appointment-time');
 
-            timeSel.innerHTML = '';
-            if (!date || !doc || doc === 'auto') {
-                timeSel.innerHTML = '<option value="">Select date and doctor</option>';
-                return;
-            }
+            timeSel.innerHTML = '<option>Loading slots...</option>';
+            if (!date || !doc) return;
 
             fetchJSON(`get_available_slots.php?doctor_id=${doc}&date=${encodeURIComponent(date)}`)
                 .then(slots => {
                     if (!slots.length) {
-                        timeSel.innerHTML = '<option value="">No slots available</option>';
+                        timeSel.innerHTML = '<option value="">No available slots</option>';
                         return;
                     }
+                    timeSel.innerHTML = '';
                     slots.forEach(s => {
                         const o = document.createElement('option');
                         o.value = s;
@@ -235,7 +238,41 @@
                     timeSel.innerHTML = '<option value="">Error loading slots</option>';
                 });
         });
+
+        // Handle booking
+        document.getElementById('appt-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            try {
+                const res = await fetch('appointments.php', { method: 'POST', body: formData });
+                const result = await res.json();
+
+                if (result.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Appointment Booked!',
+                        text: result.message,
+                        confirmButtonColor: '#1a3fc3'
+                    });
+                    this.reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Booking Failed',
+                        text: result.message,
+                        confirmButtonColor: '#1a3fc3'
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: 'Something went wrong. Please try again later.'
+                });
+            }
+        });
     </script>
+
 </body>
 
 </html>
