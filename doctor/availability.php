@@ -1,7 +1,7 @@
 <?php
 // doctor/availability.php
 session_start();
-require_once __DIR__ . '/error_handler.php';
+require_once __DIR__ . '/../error_handler.php';
 require_once __DIR__ . '/../db.php';
 
 // 1. Ensure only logged-in doctors can access

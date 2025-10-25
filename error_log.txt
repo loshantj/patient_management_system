@@ -1,0 +1,15 @@
+[2025-10-23 12:52:00] Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[2025-10-23 12:52:22] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:52:44] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:53:04] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:53:24] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:54:15] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:54:37] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:54:52] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:56:17] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 12:57:17] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 13:00:26] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 13:01:01] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 16:38:24] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 16:50:18] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
+[2025-10-23 16:50:34] Database Error: SQLSTATE[HY000] [1130] Host 'localhost' is not allowed to connect to this MariaDB server
